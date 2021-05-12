@@ -1,31 +1,36 @@
+param Meses;
+
 set Planetas;
 set Tipo;
 set Operacao;
+set T:= 1..Meses;
+set B:= 0..Meses;
 
 
 param CustoViagem;
-param Meses;
+
 param PrecoInventarioTerra;
-param Preco{Planetas, Tipo, {1..Meses}};
+param Preco{Planetas, Tipo, T};
 param CapacidadeFoguete;
 param CapacidadeProducao{Operacao, Tipo};
 
 
-var Ativado{Planetas, {1..Meses}} binary;
-var Produzido{Tipo, {1..Meses}} >= 0;
-var Exportado{Planetas, Tipo, {1..Meses}} >= 0;
-var InventorioT{Tipo, {0..Meses}} >= 0;
+
+var Ativado{Planetas, T} binary;
+var Produzido{Tipo, T} >= 0;
+var Exportado{Planetas, Tipo, T} >= 0;
+var InventorioT{Tipo, B} >= 0;
 
 maximize Lucro:
-  sum{p in Planetas, t in Tipo, m in {1..Meses}}
+  sum{p in Planetas, t in Tipo, m in T}
      (Exportado[p, t, m] * Preco[p, t, m])
   -
-  PrecoInventarioTerra * sum {t in Tipo, m in {1..Meses}}
+  PrecoInventarioTerra * sum {t in Tipo, m in T}
                   InventorioT[t, m]
-  -  CustoViagem * sum{p in Planetas, m in {1..Meses}} Ativado[p,m];
+  -  CustoViagem * sum{p in Planetas, m in T} Ativado[p,m];
 
 subject to
-  Foguete{m in {1..Meses}, p in Planetas}:
+  Foguete{m in T, p in Planetas}:
      sum{t in Tipo}
         Exportado[p, t, m] <= CapacidadeFoguete*Ativado[p,m];
 
@@ -33,10 +38,10 @@ subject to
   CapInventorioIniT{t in Tipo}:
      InventorioT[t, 0] = 0;
 
-  BalancoInventorioT{t in Tipo, m in {1..Meses}}:
+  BalancoInventorioT{t in Tipo, m in T}:
     InventorioT[t, m] = InventorioT[t, m-1] + Produzido[t, m] - sum{p in Planetas} Exportado[p, t, m];
 
-  CapacidadeLinhaProducao{o in Operacao, m in {1..Meses}}:
+  CapacidadeLinhaProducao{o in Operacao, m in T}:
      sum{t in Tipo} (Produzido[t, m] / CapacidadeProducao[o, t]) <= 1;
 
   
