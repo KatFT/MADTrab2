@@ -1,6 +1,6 @@
-set Planetas := Venus Mars Mercury;
-set Tipo := R C I;
-set Operacao := Cleaning Cooking Packing;
+set P := Venus Mars Mercury;
+set T := R C I;
+set O := Cleaning Cooking Packing;
 
 param Meses := 12;
 param PrecoInventarioTerra := 1;
